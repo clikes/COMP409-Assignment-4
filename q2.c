@@ -63,7 +63,7 @@ char *buildString()
     int max = STRINGSIZE - 3;
 
     /* seed the rnd generator (use a fixed number rather than the time for testing) */
-    srand((unsigned int)time(NULL));
+    srand(2);
 
     /* And build a long string that might actually match */
     int j = 0;
@@ -99,20 +99,26 @@ void parallel(char *string){
     int current_state = 0;
     int current_thread_num = omp_get_thread_num();
     int start_position = (STRINGSIZE / (n + 4)) * 4;
-    if (current_thread_num != 0)
-    {
-        t = 4;
-        current_state = 1;
-        iteretion = STRINGSIZE / (n + 4);
-        detect_position += (start_position + (iteretion)*(current_thread_num-1));
-        }
-    else
-    {
-        iteretion = (STRINGSIZE / (n + 4)) * 4;
+    if (current_thread_num != 0 ){
+            t = 4;
+            current_state = 1;
+            iteretion = STRINGSIZE / (n + 1);
+            detect_position += iteretion * (current_thread_num);
     }
-    if (current_thread_num == n){
-        iteretion = STRINGSIZE - (start_position + (iteretion) * (current_thread_num - 1));
-    } 
+    // if (current_thread_num != 0)
+    // {
+    //     t = 4;
+    //     current_state = 1;
+    //     iteretion = STRINGSIZE / (n + 4);
+    //     detect_position += (start_position + (iteretion)*(current_thread_num-1));
+    //     }
+    // else
+    // {
+    //     iteretion = (STRINGSIZE / (n + 4)) * 4;
+    // }
+    // if (current_thread_num == n){
+    //     iteretion = STRINGSIZE - (start_position + (iteretion) * (current_thread_num - 1));
+    // } 
     int start_state = current_state;
     int result[5];
     //printf("iteretion: %d %d start position %d %d\n", iteretion, strlen(string), (detect_position- string ), omp_get_thread_num());
@@ -121,6 +127,7 @@ void parallel(char *string){
         
         for (int j = 0; j < iteretion; j++)
         {
+            if (current_state == 4) break;
             char current_char = detect_position[j];
             //printf("%d %c %d\n", current_thread_num,current_char,current_state);
             //puts("1");
@@ -163,7 +170,7 @@ int main(int argc, char *argv[]) {
         dfaTable[0][j] = 0;
     }
     char *string = buildString();
-    string[1] = 'f';
+    //string[1] = 'f';
 
     struct timeval start;
     struct timeval end;
@@ -175,7 +182,7 @@ int main(int argc, char *argv[]) {
     int result_state = 0; //start state
     for (int i = 0 ; i< (n+1) ;i++){
         result_state = dfaTable[i][result_state];
-        printf("%d %d\n", i,result_state);
+        //printf("%d %d\n", i,result_state);
         // for (int j = 0; j < 5; j++)
         // {
         //     printf("Table: %d %d \n", j, dfaTable[i][j]);
@@ -184,6 +191,6 @@ int main(int argc, char *argv[]) {
 
     gettimeofday(&end, NULL);
 
-    printf("%d time: %ld\n", result_state, (1000000 * (end.tv_sec - start.tv_sec ))+ end.tv_usec - start.tv_usec);
+    printf("%d time: %ld\n", result_state, ((1000000 * (end.tv_sec - start.tv_sec ))+ end.tv_usec - start.tv_usec)/1000);
     return 0;
 }

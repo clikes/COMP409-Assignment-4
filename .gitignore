@@ -54,3 +54,6 @@ dkms.conf
 dfa
 openmptest
 q2
+/bin/
+.project
+.classpath
