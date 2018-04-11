@@ -53,7 +53,6 @@ dkms.conf
 *.json
 dfa
 openmptest
-q2
 /bin/
 .project
 .classpath
